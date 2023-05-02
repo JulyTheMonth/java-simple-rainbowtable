@@ -11,8 +11,8 @@ import java.util.HexFormat;
 public class MiniRbTable {
 
 
-//    private final int NUMBER_OF_CHAIN = 2000;
-    private final int NUMBER_OF_CHAIN = 3202;
+    private final int NUMBER_OF_CHAIN = 2000;
+//    private final int NUMBER_OF_CHAIN = 3202;
 
     private final int NUMBER_OF_PASSWORDS = 2000;
 
