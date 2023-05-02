@@ -11,8 +11,8 @@ import java.util.HexFormat;
 public class MiniRbTable {
 
 
-    private final int NUMBER_OF_CHAIN = 2000;
-//    private final int NUMBER_OF_CHAIN = 3202;
+//    private final int NUMBER_OF_CHAIN = 2000;
+    private final int NUMBER_OF_CHAIN = 3202;
 
     private final int NUMBER_OF_PASSWORDS = 2000;
 
@@ -38,19 +38,19 @@ public class MiniRbTable {
     public void generateRainbowTable() {
         String lastPass = "";
         String currPassword = "";
-        for (int i = 0; i < NUMBER_OF_PASSWORDS; i++) {
-            currPassword = getString();
+        for (int i = 0; i < NUMBER_OF_PASSWORDS; i++) { //Loops through all passwort within the number of passwords.
+            currPassword = getString(); //Get Passwort as String.
             System.out.println(currPassword);
-            lastPass = calcChain(currPassword);
+            lastPass = calcChain(currPassword); //Calculates all 2000 Chains and gets the last one.
             System.out.println(lastPass);
 
             System.out.println("__________________________________________--");
-            lastToFirst.put(lastPass, currPassword);
-            incrementChars();
+            lastToFirst.put(lastPass, currPassword);//Saves it in the map
+            incrementChars(); // Increments the pasword.
         }
     }
 
-    private String getString() {
+    private String getString() { //get String for the number array.
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < PASSWORDLENGTH; i++) {
             stringBuilder.append(order[currentChars[i]]);
@@ -59,7 +59,7 @@ public class MiniRbTable {
     }
 
 
-    public void incrementChars() {
+    public void incrementChars() { // increments the password by one
         for (int i = PASSWORDLENGTH - 1; i >= 0; i--) {
             int id = currentChars[i]++;
 
@@ -96,32 +96,25 @@ public class MiniRbTable {
         return redString.reverse().toString(); //Reverse sb.append();
     }
 
-    public String getPasswordOf(String hash) {
-        byte[] startBytes = HexFormat.of().parseHex(hash);
-        boolean found = false;
-        String foundStart = null;
-        for (int i = 0; i < NUMBER_OF_CHAIN; i++) {
-            int startRound = NUMBER_OF_CHAIN-1 - i;
+    public String getPasswordOf(String hash) { // Gets the password of a hash based on the rbTable.
+        byte[] startBytes = HexFormat.of().parseHex(hash); // get bytes of the Hash.
+        for (int i = 0; i < NUMBER_OF_CHAIN; i++) { //loops through all chains.
+            int startRound = NUMBER_OF_CHAIN-1 - i; //Start from behind.
             byte[] currBytes = startBytes;
             String reduction = "";
             for (int j = startRound; j < NUMBER_OF_CHAIN; j++) {
                 reduction = reduction(currBytes, j); //Get Reduction
-//                if (lastToFirst.containsKey(reduction)){ //Check if reduction is there
-//                    found = true;
-//                    foundStart = lastToFirst.get(reduction);
-//                    break;
-//                }
                 md.update(reduction.getBytes()); //Hash if not
                 currBytes = md.digest();
 
             }
 
-            if (lastToFirst.containsKey(reduction)) {
+            if (lastToFirst.containsKey(reduction)) { // If the reduction is in the rb -Table.
                 String curr = lastToFirst.get(reduction);
-                for (int j = 0; j <= NUMBER_OF_CHAIN - startRound; j++) {
-                    md.update(curr.getBytes()); //Hash if not
+                for (int j = 0; j <= NUMBER_OF_CHAIN - startRound; j++) {//Start from begingin to the found location to get the password.
+                    md.update(curr.getBytes()); //Hashes the string.
                     byte [] currHash = md.digest();
-                    if (Arrays.equals(currHash,startBytes)){
+                    if (Arrays.equals(currHash,startBytes)){ // If hash matches return password that lead to the hash.
                         return curr;
                     }
                     curr = reduction(currHash, j);
@@ -134,7 +127,7 @@ public class MiniRbTable {
 
     private static final byte[] HEX_ARRAY = "0123456789ABCDEF".getBytes(StandardCharsets.US_ASCII);
 
-    public static String bytesToHex(byte[] bytes) {
+    public static String bytesToHex(byte[] bytes) { //Used for Debugging.
         byte[] hexChars = new byte[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
             int v = bytes[j] & 0xFF;
